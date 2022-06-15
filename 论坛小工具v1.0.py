@@ -564,13 +564,31 @@ class DNF:
 }
 ]'''
         self.chrome_options = Options()
-        self.chrome_options.add_argument('--headless')
-        path = r'chromedriver.exe'
+        self.chrome_options.add_argument('--headless')  # 选择无头模式
+        path = r'../测试/chromedriver.exe'  # 驱动文件的相对路径
         self.browser = webdriver.Chrome(options=self.chrome_options, executable_path=path)
-        self.browser.set_window_size('1920', '1080')
+        self.browser.set_window_size('1920', '1080')  # 设置页面尺寸
         self.browser.set_page_load_timeout(10)  # 页面加载超时
         self.browser.implicitly_wait(10)  # 执行命令超时
-        self.browser.maximize_window()
+
+    def update(self):
+        """
+        运行前检查更新
+        :return:
+        """
+        update_url = 'https://github.com/wyrco/dnf_bbs'
+        self.browser.get(update_url)
+        sleep(10)
+        res = self.browser.page_source
+        new_name, new_url = re.findall('<a class=".*?" title=".*?" data-pjax=".*?" href="(.*?)">(.*?)</a>', res)
+
+        '<a class="js-navigation-open Link--primary" title="论坛小工具v1.0.exe" data-pjax="#repo-content-pjax-container" href="/wyrco/dnf_bbs/blob/main/%E8%AE%BA%E5%9D%9B%E5%B0%8F%E5%B7%A5%E5%85%B7v1.0.exe">论坛小工具v1.0.exe</a>'
+
+    def get_msg(self):
+        """
+        从本地读取基本信息
+        :return:
+        """
 
     def daily_share_feel(self):
         """
@@ -605,7 +623,9 @@ class DNF:
         self.daily_id = self.browser.current_url[32:]
         self.daily_name = self.browser.find_element_by_xpath("//*[@class='tit']/em").text
         lyric_list = \
-            re.findall(r'<div id="lyric-content" class=".*?" data-song-id=".*?" data-third-copy=".*? copy-from=".*?">(.*?)</div>', res)[0]
+            re.findall(
+                r'<div id="lyric-content" class=".*?" data-song-id=".*?" data-third-copy=".*? copy-from=".*?">(.*?)</div>',
+                res)[0]
         lyric = lyric_list.split('<br>')
         new_lyric = []
         for i in lyric:
@@ -715,7 +735,8 @@ class DNF:
         """
         date = datetime.datetime.now()
         with open('日志.txt', 'at', encoding='utf-8') as f:
-            f.write('日期:' + str(date) + '-----' + '歌名:' + self.daily_name + '-----' + '心情:' + self.feel_list[self.today] + '\n')
+            f.write('日期:' + str(date) + '-----' + '歌名:' + self.daily_name + '-----' + '心情:' + self.feel_list[
+                self.today] + '\n')
 
     def __del__(self):
         """
