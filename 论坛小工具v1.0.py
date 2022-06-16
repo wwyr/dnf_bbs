@@ -1,11 +1,12 @@
-import re
-import json
 import datetime
+import json
+import re
+from time import sleep
+
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium import webdriver
-from time import sleep
 
 
 class DNF:
@@ -576,13 +577,11 @@ class DNF:
         运行前检查更新
         :return:
         """
-        update_url = 'https://github.com/wyrco/dnf_bbs'
+        update_url = 'https://gitee.com/wyrco/bbstool'
         self.browser.get(update_url)
         sleep(10)
         res = self.browser.page_source
-        new_name, new_url = re.findall('<a class=".*?" title=".*?" data-pjax=".*?" href="(.*?)">(.*?)</a>', res)
-
-        '<a class="js-navigation-open Link--primary" title="论坛小工具v1.0.exe" data-pjax="#repo-content-pjax-container" href="/wyrco/dnf_bbs/blob/main/%E8%AE%BA%E5%9D%9B%E5%B0%8F%E5%B7%A5%E5%85%B7v1.0.exe">论坛小工具v1.0.exe</a>'
+        new_name, new_url = re.findall('<a title="(论坛小工具.*?).exe" href="(.*?)">论坛小工具.*?.exe</a>', res)[0]
 
     def get_msg(self):
         """
@@ -622,10 +621,7 @@ class DNF:
         self.daily_img = re.findall(r'img src=".*?" class=".*?" data-src="(.*?)">', res)[0]
         self.daily_id = self.browser.current_url[32:]
         self.daily_name = self.browser.find_element_by_xpath("//*[@class='tit']/em").text
-        lyric_list = \
-            re.findall(
-                r'<div id="lyric-content" class=".*?" data-song-id=".*?" data-third-copy=".*? copy-from=".*?">(.*?)</div>',
-                res)[0]
+        lyric_list = re.findall(r'<div id="lyric-content" class=".*?" data-song-id=".*?" data-third-copy=".*? copy-from=".*?">(.*?)</div>', res)[0]
         lyric = lyric_list.split('<br>')
         new_lyric = []
         for i in lyric:
